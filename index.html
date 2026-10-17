@@ -73,6 +73,14 @@
     font-size:.8rem;letter-spacing:.05em;color:rgba(243,243,243,.9);background:rgba(243,243,243,.04);
   }
   .chips li.tag{border-color:rgba(196,243,5,.5);color:var(--amber)}
+  .live{
+    display:inline-flex;align-items:center;gap:9px;margin:0 0 30px;
+    border:1px solid var(--line-strong);border-radius:999px;padding:7px 15px;
+    font-size:.79rem;color:rgba(243,243,243,.85);background:rgba(243,243,243,.045);letter-spacing:.02em;
+  }
+  .live .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 4px rgba(196,243,5,.18);flex:none}
+  .live.off .dot{background:rgba(243,243,243,.45);box-shadow:none}
+  .live.off{color:var(--muted)}
 
   /* ---------- KPIs ---------- */
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:14px}
@@ -258,6 +266,8 @@
       <li>Trabajo de grado · Universidad ECCI</li>
     </ul>
 
+    <p class="live off" id="estado-datos"><span class="dot"></span><span id="estado-texto">Consultando los resultados de la encuesta…</span></p>
+
     <div class="kpis" id="kpis"></div>
   </div>
 </header>
@@ -284,37 +294,39 @@
       <p class="sec-sub">
         Encuesta de movilidad eléctrica aplicada entre el <strong>14 y el 18 de septiembre de 2026</strong> a
         la comunidad universitaria del corredor del sur de Cali (Universidad ICESI y Universidad
-        Autónoma de Occidente), difundida con código QR. Se obtuvieron <strong>21 respuestas</strong> de
-        personas entre 17 y 43 años (promedio 21,5). Sus resultados son la línea base del proyecto.
+        Autónoma de Occidente), difundida con código QR. Se obtuvieron
+        <strong><span id="txt-n">21</span> respuestas</strong> de personas de
+        <span id="txt-edad">17</span> a <span id="txt-edad-max">43</span> años (promedio
+        <span id="txt-prom">21,5</span>). Sus resultados son la línea base del proyecto.
       </p>
 
       <div class="grid g2" style="margin-bottom:18px">
         <div class="card">
-          <span class="badge">Uso actual · n = 21</span>
+          <span class="badge" id="bdg-uso">Uso actual</span>
           <div class="split">
             <div class="donut" id="donut-uso"></div>
             <div>
               <h3>Movilidad eléctrica en el corredor</h3>
-              <p style="margin:0;font-size:.92rem;color:rgba(243,243,243,.85)">
+              <p style="margin:0;font-size:.92rem;color:rgba(243,243,243,.85)" id="txt-uso">
                 16 de las 21 personas encuestadas ya se movilizan en un vehículo eléctrico:
                 patineta, bicicleta, motocicleta o carro eléctrico. Las otras 5 todavía no.
               </p>
               <div class="legend">
-                <span><i style="background:var(--amber)"></i>Usa movilidad eléctrica (16)</span>
-                <span><i style="background:rgba(243,243,243,.22)"></i>Aún no (5)</span>
+                <span><i style="background:var(--amber)"></i><span id="lg-si">Usa movilidad eléctrica (16)</span></span>
+                <span><i style="background:rgba(243,243,243,.22)"></i><span id="lg-no">Aún no (5)</span></span>
               </div>
             </div>
           </div>
         </div>
 
         <div class="card">
-          <span class="badge">Interés en las dos funciones · n = 16</span>
+          <span class="badge" id="bdg-interes">Interés en las dos funciones</span>
           <h3>Disposición a usar la aplicación</h3>
           <div class="gauges" style="margin-top:16px">
             <div class="gauge" id="gauge-bateria"></div>
             <div class="gauge" id="gauge-rutas"></div>
           </div>
-          <p class="card-note" style="margin-top:14px">
+          <p class="card-note" style="margin-top:14px" id="txt-interes">
             Sobre quienes ya usan movilidad eléctrica: 15 de 16 respondieron «sí, me interesaría
             mucho» tanto a la función de autonomía (¿podré completar el trayecto con la batería que
             queda?) como a la de rutas seguras.
@@ -324,23 +336,23 @@
 
       <div class="grid g3">
         <div class="card tight">
-          <span class="badge">n = 16</span>
+          <span class="badge" id="bdg-frec">Frecuencia</span>
           <h3>Frecuencia de viaje</h3>
           <p class="card-note" style="margin:-2px 0 16px">¿Cuántas veces por semana va a la universidad?</p>
           <div class="bars" id="bars-frecuencia"></div>
-          <p class="card-note"><strong style="color:var(--amber)">88 %</strong> viaja 3 o más veces por semana: el trayecto es recurrente y la autonomía importa todos los días.</p>
+          <p class="card-note"><strong style="color:var(--amber)" id="p-frec">88 %</strong> <span id="t-frec">viaja 3 o más veces por semana: el trayecto es recurrente y la autonomía importa todos los días.</span></p>
         </div>
 
         <div class="card tight">
-          <span class="badge">n = 16</span>
+          <span class="badge" id="bdg-dist">Distancia</span>
           <h3>Distancia casa–universidad</h3>
           <p class="card-note" style="margin:-2px 0 16px">Distancia aproximada por trayecto.</p>
           <div class="bars" id="bars-distancia"></div>
-          <p class="card-note"><strong style="color:var(--amber)">63 %</strong> recorre entre 1 y 5 km: distancias cortas, donde la micromovilidad eléctrica compite de frente con el carro y el transporte público.</p>
+          <p class="card-note"><strong style="color:var(--amber)" id="p-dist">63 %</strong> <span id="t-dist">recorre entre 1 y 5 km: distancias cortas, donde la micromovilidad eléctrica compite de frente con el carro y el transporte público.</span></p>
         </div>
 
         <div class="card tight">
-          <span class="badge">n = 16</span>
+          <span class="badge" id="bdg-medio">Vehículo</span>
           <h3>Vehículo que usa</h3>
           <p class="card-note" style="margin:-2px 0 16px">Medio de transporte principal.</p>
           <div class="bars" id="bars-medio"></div>
@@ -348,15 +360,15 @@
         </div>
 
         <div class="card tight">
-          <span class="badge">n = 16</span>
+          <span class="badge" id="bdg-tiempo">Tiempo</span>
           <h3>Duración del trayecto</h3>
           <p class="card-note" style="margin:-2px 0 16px">Tiempo de casa a la universidad.</p>
           <div class="bars" id="bars-tiempo"></div>
-          <p class="card-note">82 % completa el trayecto en menos de 30 minutos.</p>
+          <p class="card-note"><strong id="p-tiempo">82 %</strong> <span id="t-tiempo">completa el trayecto en menos de 30 minutos.</span></p>
         </div>
 
         <div class="card tight">
-          <span class="badge">n = 5 · aún sin vehículo eléctrico</span>
+          <span class="badge" id="bdg-prec">Aún sin vehículo eléctrico</span>
           <h3>Qué les preocupa de dar el paso</h3>
           <p class="card-note" style="margin:-2px 0 16px">Nivel de preocupación declarado, escala de 1 a 5.</p>
           <div class="gauges">
@@ -375,7 +387,8 @@
           <div class="bars" id="bars-uni" style="margin-top:14px"></div>
           <div class="bars" id="bars-edad" style="margin-top:22px"></div>
           <p class="card-note">
-            2 universidades del corredor, edades entre 17 y 43 años (promedio 21,5).
+            2 universidades del corredor, edades entre <span id="txt-edad2">17</span> y
+            <span id="txt-edad-max2">43</span> años (promedio <span id="txt-prom2">21,5</span>).
           </p>
         </div>
       </div>
@@ -403,9 +416,10 @@
     <div class="wrap">
       <div class="sec-head"><span class="sec-num">02</span><h2>Hallazgos cualitativos</h2></div>
       <p class="sec-sub">
-        Ocho de las 16 personas que usan movilidad eléctrica dejaron una sugerencia abierta sobre
-        qué debería hacer la aplicación. Se agrupan en cuatro temas y se citan de forma anónima:
-        el tablero es público y no publica ningún dato personal de las personas encuestadas.
+        <strong id="txt-sug">Ocho</strong> de las <strong id="txt-sug-base">16</strong> personas que usan
+        movilidad eléctrica dejaron una sugerencia abierta sobre qué debería hacer la aplicación.
+        Se agrupan en cuatro temas y se citan de forma anónima: el tablero es público y no publica
+        ningún dato personal de las personas encuestadas.
       </p>
       <div class="grid g2">
         <div class="card">
@@ -439,8 +453,8 @@
             </p>
           </div>
           <p class="card-note" style="margin-top:18px">
-            Las citas se reproducen con ajustes mínimos de puntuación y ortografía; no incluyen
-            nombres, correos ni teléfonos.
+            Las citas corresponden a la aplicación de septiembre de 2026 y se reproducen con
+            ajustes mínimos de puntuación y ortografía; no incluyen nombres, correos ni teléfonos.
           </p>
         </div>
       </div>
@@ -559,7 +573,7 @@
       </div>
       <div style="text-align:right;min-width:230px">
         <p style="font-family:var(--display);font-weight:600;color:var(--ivory);letter-spacing:.1em;text-transform:uppercase;font-size:.78rem;margin-bottom:8px">Tablero de resultados</p>
-        <p style="margin:0">Encuesta: 21 respuestas · 14–18 sep 2026</p>
+        <p style="margin:0" id="foot-n">Encuesta: 21 respuestas · 14–18 sep 2026</p>
         <p style="margin:0">Actualizado: octubre de 2026</p>
         <p style="margin:0">Marca del proyecto: Ruta CCV</p>
       </div>
@@ -573,10 +587,26 @@
 
 <script>
 /* ==========================================================================
-   DATOS  ·  única fuente de verdad del tablero
-   Encuesta de movilidad eléctrica — corredor universitario del sur de Cali
-   21 respuestas · 14 al 18 de septiembre de 2026
+   DATOS DEL TABLERO
+   --------------------------------------------------------------------------
+   1) DATOS hasta abajo = valores de respaldo, tomados de la encuesta de
+      movilidad aplicada en el corredor del sur de Cali entre el 14 y el 18 de
+      septiembre de 2026 (21 respuestas). El tablero SIEMPRE funciona con ellos.
+   2) FUENTE.hojaId = si se pega aquí el ID de la hoja pública de agregados, el
+      tablero lee esos valores al abrirse y se actualiza solo. Si la lectura
+      falla (sin internet, hoja privada, etc.) se queda con los de respaldo.
    ========================================================================== */
+
+const FUENTE = {
+  // Pegar SOLO el ID de la hoja de Google (lo que va entre /d/ y /edit).
+  // Ejemplo: "1AbCdEfGhIjKlMnOpQrStUvWxYz1234567890"
+  hojaId: "",
+  hoja: "datos",          // nombre de la pestaña con la tabla clave → valor
+  claveCol: 0,            // columna A = nombre del indicador
+  valorCol: 1,            // columna B = valor
+  tiempoEspera: 4000      // ms que espera la lectura antes de seguir con el respaldo
+};
+
 const DATA = {
   encuesta: { respuestas: 21, inicio: "14 de septiembre de 2026", fin: "18 de septiembre de 2026",
               edadMin: 17, edadMax: 43, edadProm: 21.5 },
@@ -608,6 +638,7 @@ const DATA = {
     {l:"Entre 30 y 45 minutos", n:1}
   ]},
   preocupacion: { base: 5, seguridad: 4.4, bateria: 4.2 },   // escala 1 a 5
+  sugerencias: 8,
   metas: [
     { t:"Caracterización del problema y de la relación carga–autonomía", p:45,
       producto:"Catálogo georreferenciado del corredor y tabla de correspondencia entre los indicadores de carga (porcentaje, barras o niveles) y la autonomía estimada." },
@@ -632,10 +663,76 @@ const DATA = {
   ]
 };
 
+/* -------------------------------------------------------------------------
+   Los valores que llegan de la hoja pública se vuelcan sobre DATA.
+   Las claves son las de la columna A de la hoja (ver hoja-espejo.md).
+   ------------------------------------------------------------------------- */
+function aplicarEnVivo(m){
+  const num = (v)=>{
+    if (typeof v === "number") return isFinite(v) ? v : null;
+    if (v === null || v === undefined) return null;
+    let s = String(v).trim();
+    if (!s) return null;
+    if (s.indexOf(",") !== -1 && s.indexOf(".") !== -1) s = s.replace(/\./g,"").replace(",",".");
+    else if (s.indexOf(",") !== -1) s = s.replace(",",".");
+    const n = Number(s.replace(/[^\d.\-]/g,""));
+    return isNaN(n) ? null : n;
+  };
+  const g = (clave, respaldo)=> { const v = num(m[clave]); return v === null ? respaldo : v; };
+
+  DATA.encuesta.respuestas = g("total_respuestas", DATA.encuesta.respuestas);
+  DATA.usaElectrico.si     = g("total_electricos", DATA.usaElectrico.si);
+  DATA.usaElectrico.no     = Math.max(0, DATA.encuesta.respuestas - DATA.usaElectrico.si);
+
+  DATA.universidades[0].n  = g("universidad_icesi", DATA.universidades[0].n);
+  DATA.universidades[1].n  = g("universidad_uao",   DATA.universidades[1].n);
+
+  DATA.encuesta.edadMin    = g("edad_min",  DATA.encuesta.edadMin);
+  DATA.encuesta.edadMax    = g("edad_max",  DATA.encuesta.edadMax);
+  DATA.encuesta.edadProm   = g("edad_prom", DATA.encuesta.edadProm);
+
+  DATA.interes.base        = g("base_interes",    DATA.interes.base);
+  DATA.interes.bateria     = g("interes_bateria", DATA.interes.bateria);
+  DATA.interes.rutas       = g("interes_rutas",   DATA.interes.rutas);
+
+  DATA.frecuencia.base            = g("base_frecuencia",  DATA.frecuencia.base);
+  DATA.frecuencia.filas[0].n      = g("frecuencia_5mas",  DATA.frecuencia.filas[0].n);
+  DATA.frecuencia.filas[1].n      = g("frecuencia_3a4",   DATA.frecuencia.filas[1].n);
+  DATA.frecuencia.filas[2].n      = g("frecuencia_1a2",   DATA.frecuencia.filas[2].n);
+  DATA.frecuencia.agregado.n      = DATA.frecuencia.filas[0].n + DATA.frecuencia.filas[1].n;
+
+  DATA.distancia.base             = g("base_distancia",   DATA.distancia.base);
+  DATA.distancia.filas[0].n       = g("distancia_1a3",    DATA.distancia.filas[0].n);
+  DATA.distancia.filas[1].n       = g("distancia_3a5",    DATA.distancia.filas[1].n);
+  DATA.distancia.filas[2].n       = g("distancia_5a10",   DATA.distancia.filas[2].n);
+  DATA.distancia.filas[3].n       = g("distancia_mas10",  DATA.distancia.filas[3].n);
+  DATA.distancia.agregado.n       = DATA.distancia.filas[0].n + DATA.distancia.filas[1].n;
+
+  DATA.medio.base                 = g("base_medio",       DATA.medio.base);
+  DATA.medio.filas[0].n           = g("medio_patineta",   DATA.medio.filas[0].n);
+  DATA.medio.filas[1].n           = g("medio_motocicleta",DATA.medio.filas[1].n);
+  DATA.medio.filas[2].n           = g("medio_carro",      DATA.medio.filas[2].n);
+  DATA.medio.filas[3].n           = g("medio_bicicleta",  DATA.medio.filas[3].n);
+  DATA.medio.filas[4].n           = g("medio_bici_bus",   DATA.medio.filas[4].n);
+
+  DATA.tiempo.base                = g("base_tiempo",      DATA.tiempo.base);
+  DATA.tiempo.filas[0].n          = g("tiempo_menos15",   DATA.tiempo.filas[0].n);
+  DATA.tiempo.filas[1].n          = g("tiempo_15a30",     DATA.tiempo.filas[1].n);
+  DATA.tiempo.filas[2].n          = g("tiempo_mas45",     DATA.tiempo.filas[2].n);
+  DATA.tiempo.filas[3].n          = g("tiempo_30a45",     DATA.tiempo.filas[3].n);
+
+  DATA.preocupacion.base          = g("base_preocupacion",  DATA.preocupacion.base);
+  DATA.preocupacion.seguridad     = g("preocupacion_seguridad", DATA.preocupacion.seguridad);
+  DATA.preocupacion.bateria       = g("preocupacion_bateria",   DATA.preocupacion.bateria);
+
+  DATA.sugerencias                = g("sugerencias",      DATA.sugerencias);
+}
+
 /* ------------------------- utilidades ------------------------- */
-const pct = (n,b) => Math.round((n/b)*100);
+const pct = (n,b) => b ? Math.round((n/b)*100) : 0;
 const el  = (id) => document.getElementById(id);
 const f1  = (x) => String(x).replace(".", ",");
+const txt = (id, t) => { const n = el(id); if (n) n.textContent = t; };
 
 function barsHTML(rows, base, opts={}){
   const max = Math.max(...rows.map(r=>r.n)) || 1;
@@ -649,7 +746,7 @@ function barsHTML(rows, base, opts={}){
   }).join("");
 }
 
-function donutHTML(value, total, sisaLabel, subLabel){
+function donutHTML(value, total, subLabel){
   const p = pct(value, total);
   const r = 54, c = 2*Math.PI*r, dash = (p/100)*c;
   return `<svg viewBox="0 0 132 132" width="132" height="132" role="img" aria-label="${p} %">
@@ -660,13 +757,22 @@ function donutHTML(value, total, sisaLabel, subLabel){
     <div class="mid">${p}%<span>${subLabel}</span></div>`;
 }
 
+function arcoHTML(p, etiqueta){
+  const L = Math.PI*50, d = (p/100)*L;
+  return `<svg viewBox="0 0 120 72" role="img" aria-label="${p} por ciento">
+      <path d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="rgba(243,243,243,.13)" stroke-width="10" stroke-linecap="round"/>
+      <path d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="#C4F305" stroke-width="10" stroke-linecap="round"
+            stroke-dasharray="${d.toFixed(1)} ${(L-d).toFixed(1)}"/>
+    </svg>
+    <div class="gv">${p}<small> %</small></div>
+    <div class="gl">${etiqueta}</div>`;
+}
+
 function gaugeHTML(value, max, label){
-  const L = Math.PI*50;                       // longitud del arco semicircular
-  const d = (value/max)*L;
-  const col = value >= 4 ? "#C4F305" : (value >= 3 ? "#C4F305" : "#5720FE");
+  const L = Math.PI*50, d = (Math.min(value,max)/max)*L;
   return `<svg viewBox="0 0 120 72" role="img" aria-label="${f1(value)} de ${max}">
       <path d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="rgba(243,243,243,.13)" stroke-width="10" stroke-linecap="round"/>
-      <path d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="${col}" stroke-width="10" stroke-linecap="round"
+      <path d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="#C4F305" stroke-width="10" stroke-linecap="round"
             stroke-dasharray="${d.toFixed(1)} ${(L-d).toFixed(1)}"/>
     </svg>
     <div class="gv">${f1(value)}<small> / ${max}</small></div>
@@ -674,92 +780,180 @@ function gaugeHTML(value, max, label){
 }
 
 /* ------------------------- render ------------------------- */
-// KPIs del encabezado
-el("kpis").innerHTML = [
-  { n: DATA.encuesta.respuestas, s:"respuestas", l:"Encuesta de movilidad aplicada en el corredor", src:"14–18 sep 2026", cls:"" },
-  { n: pct(DATA.usaElectrico.si, DATA.encuesta.respuestas)+" %", s:"16 de 21", l:"Ya se moviliza en un vehículo eléctrico", src:"Base: 21 respuestas", cls:"" },
-  { n: pct(DATA.interes.bateria, DATA.interes.base)+" %", s:"15 de 16", l:"Le interesaría una app que calcule si alcanza la batería", src:"Base: usuarios de eléctricos", cls:"" },
-  { n: pct(DATA.frecuencia.agregado.n, DATA.frecuencia.base)+" %", s:"14 de 16", l:"Viaja a la universidad 3 o más veces por semana", src:"Base: usuarios de eléctricos", cls:"dusk" },
-  { n: f1(DATA.preocupacion.seguridad)+"", s:"/ 5", l:"Preocupación por moverse seguro hasta el destino", src:"Base: aún sin vehículo eléctrico", cls:"dusk" }
-].map(k=>`<div class="kpi ${k.cls}">
-    <div class="num">${k.n}<small>${k.s}</small></div>
-    <div class="lbl">${k.l}</div>
-    <div class="src">${k.src}</div>
-  </div>`).join("");
+function render(){
+  const E = DATA.encuesta, N = E.respuestas;
 
-// Gráficos
-el("donut-uso").innerHTML = donutHTML(DATA.usaElectrico.si, DATA.encuesta.respuestas, "", "16 de 21");
-el("bars-frecuencia").innerHTML = barsHTML(DATA.frecuencia.filas, DATA.frecuencia.base);
-el("bars-distancia").innerHTML  = barsHTML(DATA.distancia.filas,  DATA.distancia.base);
-el("bars-medio").innerHTML      = barsHTML(DATA.medio.filas,      DATA.medio.base, {hiClass:""});
-el("bars-tiempo").innerHTML     = barsHTML(DATA.tiempo.filas,     DATA.tiempo.base);
-el("bars-uni").innerHTML        = `<div class="bar-top" style="margin-bottom:8px"><span class="l" style="font-weight:600">Universidad</span><span class="v">n = 21</span></div>`
-                                + barsHTML(DATA.universidades, DATA.encuesta.respuestas, {hiClass:"dusk"});
-el("bars-edad").innerHTML       = `<div class="bar-top" style="margin-bottom:8px"><span class="l" style="font-weight:600">Edad</span><span class="v">n = 21</span></div>`
-                                + barsHTML([
-                                    {l:"Mínima",   n:DATA.encuesta.edadMin,  hi:false, extra:DATA.encuesta.edadMin+" años"},
-                                    {l:"Promedio", n:DATA.encuesta.edadProm, hi:false, extra:f1(DATA.encuesta.edadProm)+" años"},
-                                    {l:"Máxima",   n:DATA.encuesta.edadMax,  hi:false, extra:DATA.encuesta.edadMax+" años"}
-                                  ], DATA.encuesta.edadMax);
+  /* Encabezado: indicadores clave */
+  el("kpis").innerHTML = [
+    { n:N, s:"respuestas", l:"Encuesta de movilidad aplicada en el corredor", src:"Aplicada del 14 al 18 de septiembre de 2026", cls:"" },
+    { n:pct(DATA.usaElectrico.si,N)+" %", s:DATA.usaElectrico.si+" de "+N, l:"Ya se moviliza en un vehículo eléctrico", src:"Base: "+N+" respuestas", cls:"" },
+    { n:pct(DATA.interes.bateria,DATA.interes.base)+" %", s:DATA.interes.bateria+" de "+DATA.interes.base, l:"Le interesaría una app que calcule si alcanza la batería", src:"Base: usuarios de eléctricos", cls:"" },
+    { n:pct(DATA.frecuencia.agregado.n,DATA.frecuencia.base)+" %", s:DATA.frecuencia.agregado.n+" de "+DATA.frecuencia.base, l:"Viaja a la universidad 3 o más veces por semana", src:"Base: usuarios de eléctricos", cls:"dusk" },
+    { n:f1(DATA.preocupacion.seguridad), s:"/ 5", l:"Preocupación por moverse seguro hasta el destino", src:"Base: aún sin vehículo eléctrico", cls:"dusk" }
+  ].map(k=>`<div class="kpi ${k.cls}">
+      <div class="num">${k.n}<small>${k.s}</small></div>
+      <div class="lbl">${k.l}</div>
+      <div class="src">${k.src}</div>
+    </div>`).join("");
 
-el("gauge-bateria").innerHTML = `<svg viewBox="0 0 120 72" role="img" aria-label="94 por ciento">
-    <path d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="rgba(243,243,243,.13)" stroke-width="10" stroke-linecap="round"/>
-    <path d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="#C4F305" stroke-width="10" stroke-linecap="round"
-          stroke-dasharray="147.7 9.4"/>
-  </svg><div class="gv">${pct(DATA.interes.bateria,DATA.interes.base)}<small> %</small></div>
-  <div class="gl">Alcance de la batería</div>`;
-el("gauge-rutas").innerHTML = `<svg viewBox="0 0 120 72" role="img" aria-label="94 por ciento">
-    <path d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="rgba(243,243,243,.13)" stroke-width="10" stroke-linecap="round"/>
-    <path d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="#C4F305" stroke-width="10" stroke-linecap="round"
-          stroke-dasharray="147.7 9.4"/>
-  </svg><div class="gv">${pct(DATA.interes.rutas,DATA.interes.base)}<small> %</small></div>
-  <div class="gl">Rutas seguras</div>`;
-el("gauge-pseg").innerHTML = gaugeHTML(DATA.preocupacion.seguridad, 5, "Moverse seguro hasta el destino");
-el("gauge-pbat").innerHTML = gaugeHTML(DATA.preocupacion.bateria, 5, "Quedarse sin batería a mitad de camino");
+  /* Uso de movilidad eléctrica */
+  el("donut-uso").innerHTML = donutHTML(DATA.usaElectrico.si, N, DATA.usaElectrico.si+" de "+N);
+  txt("bdg-uso", "Uso actual · n = "+N);
+  txt("txt-uso", `${DATA.usaElectrico.si} de las ${N} personas encuestadas ya se movilizan en un vehículo `
+    + `eléctrico: patineta, bicicleta, motocicleta o carro eléctrico. `
+    + (DATA.usaElectrico.no === 1 ? "La otra persona todavía no." : `Las otras ${DATA.usaElectrico.no} todavía no.`));
+  txt("lg-si", "Usa movilidad eléctrica ("+DATA.usaElectrico.si+")");
+  txt("lg-no", "Aún no ("+DATA.usaElectrico.no+")");
 
-// Tabla de frecuencias (agrupada por pregunta)
-const grupos = [
-  { g:"¿Cuántas veces por semana va a la universidad?", filas:DATA.frecuencia.filas, base:DATA.frecuencia.base },
-  { g:"Distancia entre la casa y la universidad",       filas:DATA.distancia.filas,  base:DATA.distancia.base },
-  { g:"Medio de transporte principal",                  filas:DATA.medio.filas,      base:DATA.medio.base },
-  { g:"Duración del trayecto",                          filas:DATA.tiempo.filas,     base:DATA.tiempo.base },
-  { g:"Universidad en la que estudia o trabaja",        filas:DATA.universidades,    base:DATA.encuesta.respuestas }
-];
-el("tabla-frec").innerHTML = grupos.map(gr=>`
-  <tr class="group"><td colspan="2">${gr.g}</td><td class="n">base ${gr.base} respuestas</td></tr>
-  ${gr.filas.map(f=>`<tr>
-    <td>${f.l}</td><td class="n">${f.n}</td><td class="n">${pct(f.n, gr.base)} %</td>
-  </tr>`).join("")}`).join("");
+  /* Interés en las dos funciones */
+  txt("bdg-interes", "Interés en las dos funciones · n = "+DATA.interes.base);
+  el("gauge-bateria").innerHTML = arcoHTML(pct(DATA.interes.bateria,DATA.interes.base), "Alcance de la batería");
+  el("gauge-rutas").innerHTML   = arcoHTML(pct(DATA.interes.rutas,DATA.interes.base), "Rutas seguras");
+  txt("txt-interes", `Sobre quienes ya usan movilidad eléctrica: ${DATA.interes.bateria} de ${DATA.interes.base} `
+    + "respondieron «sí, me interesaría mucho» tanto a la función de autonomía (¿podré completar el "
+    + "trayecto con la batería que queda?) como a la de rutas seguras.");
 
-// Metas de logro
-el("metas-grid").innerHTML = DATA.metas.map(m=>`<div class="goal">
-    <div class="gh">
-      <div><div class="gmeta">Logro esperado</div><div class="gt">${m.t}</div></div>
-      <div class="gp">${m.p} %</div>
-    </div>
-    <div class="track"><div class="fill" data-w="${m.p}"></div></div>
-    <div class="gprod"><b>Producto que lo mide:</b> ${m.producto}</div>
-  </div>`).join("");
+  /* Bloques de frecuencia, distancia, vehículo y tiempo */
+  el("bars-frecuencia").innerHTML = barsHTML(DATA.frecuencia.filas, DATA.frecuencia.base);
+  el("bars-distancia").innerHTML  = barsHTML(DATA.distancia.filas,  DATA.distancia.base);
+  el("bars-medio").innerHTML      = barsHTML(DATA.medio.filas,      DATA.medio.base, {hiClass:""});
+  el("bars-tiempo").innerHTML     = barsHTML(DATA.tiempo.filas,     DATA.tiempo.base);
 
-// Fases
-el("fases").innerHTML = DATA.fases.map(f=>`<article class="phase">
-    <div class="pn">${f.n}</div>
-    <h3>${f.t}</h3>
-    <div class="hito"><b>Hito verificable</b>${f.h}</div>
-  </article>`).join("");
+  const b = (id, base)=> txt(id, "n = "+base);
+  b("bdg-frec", DATA.frecuencia.base); b("bdg-dist", DATA.distancia.base);
+  b("bdg-medio", DATA.medio.base);     b("bdg-tiempo", DATA.tiempo.base);
 
-// Animación de barras al entrar en pantalla
-const animar = (node)=>{ node.querySelectorAll(".fill").forEach(f=>{ f.style.width = f.dataset.w+"%"; }); };
-const fills = document.querySelectorAll(".fill");
-if ("IntersectionObserver" in window){
-  const io = new IntersectionObserver((ents)=>{
-    ents.forEach(e=>{ if(e.isIntersecting){ animar(e.target.closest("section, .card, .goal, .kpi") || document); e.target.classList.add("seen"); } });
-  }, { threshold:.15 });
-  document.querySelectorAll("section, .goal").forEach(s=>io.observe(s));
-  setTimeout(()=>fills.forEach(f=>f.style.width=f.dataset.w+"%"), 60);
-} else {
-  fills.forEach(f=>f.style.width = f.dataset.w+"%");
+  txt("p-frec", pct(DATA.frecuencia.agregado.n,DATA.frecuencia.base)+" %");
+  txt("t-frec", `(${DATA.frecuencia.agregado.n} de ${DATA.frecuencia.base}) viaja 3 o más veces por semana: `
+    + "el trayecto es recurrente y la autonomía importa todos los días.");
+
+  txt("p-dist", pct(DATA.distancia.agregado.n,DATA.distancia.base)+" %");
+  txt("t-dist", `(${DATA.distancia.agregado.n} de ${DATA.distancia.base}) recorre entre 1 y 5 km: distancias `
+    + "cortas, donde la micromovilidad eléctrica compite de frente con el carro y el transporte público.");
+
+  const hasta30 = DATA.tiempo.filas[0].n + DATA.tiempo.filas[1].n;
+  txt("p-tiempo", pct(hasta30,DATA.tiempo.base)+" %");
+  txt("t-tiempo", `(${hasta30} de ${DATA.tiempo.base}) completa el trayecto en menos de 30 minutos.`);
+
+  /* Preocupaciones */
+  txt("bdg-prec", "n = "+DATA.preocupacion.base+" · aún sin vehículo eléctrico");
+  el("gauge-pseg").innerHTML = gaugeHTML(DATA.preocupacion.seguridad, 5, "Moverse seguro hasta el destino");
+  el("gauge-pbat").innerHTML = gaugeHTML(DATA.preocupacion.bateria,   5, "Quedarse sin batería a mitad de camino");
+
+  /* Contexto */
+  el("bars-uni").innerHTML = `<div class="bar-top" style="margin-bottom:8px"><span class="l" style="font-weight:600">Universidad</span><span class="v">n = ${N}</span></div>`
+                           + barsHTML(DATA.universidades, N, {hiClass:"dusk"});
+  el("bars-edad").innerHTML = `<div class="bar-top" style="margin-bottom:8px"><span class="l" style="font-weight:600">Edad</span><span class="v">n = ${N}</span></div>`
+                           + barsHTML([
+                               {l:"Mínima",   n:E.edadMin,  extra:E.edadMin+" años"},
+                               {l:"Promedio", n:E.edadProm, extra:f1(E.edadProm)+" años"},
+                               {l:"Máxima",   n:E.edadMax,  extra:E.edadMax+" años"}
+                             ], E.edadMax);
+
+  /* Tabla de frecuencias */
+  const grupos = [
+    { g:"¿Cuántas veces por semana va a la universidad?", filas:DATA.frecuencia.filas, base:DATA.frecuencia.base },
+    { g:"Distancia entre la casa y la universidad",       filas:DATA.distancia.filas,  base:DATA.distancia.base },
+    { g:"Medio de transporte principal",                  filas:DATA.medio.filas,      base:DATA.medio.base },
+    { g:"Duración del trayecto",                          filas:DATA.tiempo.filas,     base:DATA.tiempo.base },
+    { g:"Universidad en la que estudia o trabaja",        filas:DATA.universidades,    base:N }
+  ];
+  el("tabla-frec").innerHTML = grupos.map(gr=>`
+    <tr class="group"><td colspan="2">${gr.g}</td><td class="n">base ${gr.base} respuestas</td></tr>
+    ${gr.filas.map(f=>`<tr>
+      <td>${f.l}</td><td class="n">${f.n}</td><td class="n">${pct(f.n, gr.base)} %</td>
+    </tr>`).join("")}`).join("");
+
+  /* Hallazgos cualitativos */
+  txt("txt-sug", DATA.sugerencias);
+  txt("txt-sug-base", DATA.medio.base);
+
+  /* Metas de logro */
+  el("metas-grid").innerHTML = DATA.metas.map(m=>`<div class="goal">
+      <div class="gh">
+        <div><div class="gmeta">Logro esperado</div><div class="gt">${m.t}</div></div>
+        <div class="gp">${m.p} %</div>
+      </div>
+      <div class="track"><div class="fill" data-w="${m.p}"></div></div>
+      <div class="gprod"><b>Producto que lo mide:</b> ${m.producto}</div>
+    </div>`).join("");
+
+  /* Fases de la metodología */
+  el("fases").innerHTML = DATA.fases.map(f=>`<article class="phase">
+      <div class="pn">${f.n}</div>
+      <h3>${f.t}</h3>
+      <div class="hito"><b>Hito verificable</b>${f.h}</div>
+    </article>`).join("");
+
+  /* Pie */
+  txt("foot-n", "Encuesta: "+N+" respuestas · aplicada del 14 al 18 de septiembre de 2026");
+  txt("txt-n", N);
+  txt("txt-edad", E.edadMin);
+  txt("txt-edad-max", E.edadMax);
+  txt("txt-prom", f1(E.edadProm));
+  txt("txt-edad2", E.edadMin);
+  txt("txt-edad-max2", E.edadMax);
+  txt("txt-prom2", f1(E.edadProm));
+
+  /* Barras */
+  requestAnimationFrame(()=>{
+    document.querySelectorAll(".fill").forEach(f=>{ f.style.width = (f.dataset.w||0)+"%"; });
+  });
 }
+
+/* -------------------------------------------------------------------------
+   Lectura en vivo de la hoja pública de agregados (JSONP, sin CORS).
+   Si algo falla, el tablero se queda con los datos de respaldo.
+   ------------------------------------------------------------------------- */
+function estado(esEnVivo, mensaje){
+  const caja = el("estado-datos");
+  if (!caja) return;
+  caja.classList.toggle("off", !esEnVivo);
+  txt("estado-texto", mensaje);
+}
+
+function marcarRespaldo(){
+  estado(false, "Resultados de la encuesta aplicada del 14 al 18 de septiembre de 2026 · "
+              + DATA.encuesta.respuestas + " respuestas");
+}
+
+function cargarEnVivo(){
+  if (!FUENTE.hojaId){ marcarRespaldo(); return; }
+
+  let terminado = false;
+  const terminar = (fn)=>{ if (terminado) return; terminado = true; fn(); };
+
+  window.google = { visualization: { Query: { setResponse: function (d){
+    terminar(function(){
+      try{
+        const m = {};
+        ((d && d.table && d.table.rows) || []).forEach(function(r){
+          const c = r.c || [];
+          const k = c[FUENTE.claveCol] ? c[FUENTE.claveCol].v : null;
+          const v = c[FUENTE.valorCol] ? c[FUENTE.valorCol].v : null;
+          if (k !== null && k !== undefined && String(k).trim() !== "") m[String(k).trim()] = v;
+        });
+        aplicarEnVivo(m);
+        render();
+        estado(true, "Datos en vivo · " + DATA.encuesta.respuestas
+                   + " respuestas leídas del formulario (agregados, sin datos personales)");
+      }catch(e){ marcarRespaldo(); }
+    });
+  }}}};
+
+  const url = "https://docs.google.com/spreadsheets/d/" + FUENTE.hojaId + "/gviz/tq"
+            + "?tqx=out:json&headers=1&sheet=" + encodeURIComponent(FUENTE.hoja)
+            + "&tq=" + encodeURIComponent("select A, B");
+
+  const s = document.createElement("script");
+  s.src = url;
+  s.onerror = function(){ terminar(marcarRespaldo); };
+  document.head.appendChild(s);
+  setTimeout(function(){ terminar(marcarRespaldo); }, FUENTE.tiempoEspera);
+}
+
+render();
+cargarEnVivo();
 </script>
 </body>
 </html>
