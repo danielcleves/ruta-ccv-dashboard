@@ -330,6 +330,65 @@
     section{padding:42px 0}
     .logo{height:46px}
   }
+  /* ---------- Pantallas de la aplicación (mockups) ---------- */
+  .mock-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:16px}
+  .mock{
+    margin:0;padding:10px;cursor:zoom-in;position:relative;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease
+  }
+  .mock:hover,.mock:focus-visible{
+    border-color:rgba(196,243,5,.5);transform:translateY(-3px);
+    box-shadow:0 16px 34px rgba(0,0,0,.45);outline:none
+  }
+  .mock img{display:block;width:100%;height:auto;border-radius:9px;background:var(--obsidian-deep)}
+  .mock .num{
+    position:absolute;left:18px;top:18px;z-index:2;
+    font-family:var(--display);font-weight:700;font-size:.7rem;letter-spacing:.08em;
+    background:rgba(24,20,19,.86);border:1px solid rgba(196,243,5,.45);color:var(--amber);
+    padding:2px 7px;border-radius:6px
+  }
+  .mock figcaption{margin-top:10px;display:grid;gap:3px}
+  .mock figcaption b{font-family:var(--display);font-weight:600;font-size:.95rem;letter-spacing:.015em;line-height:1.25}
+  .mock figcaption span{font-size:.75rem;line-height:1.42;color:var(--muted)}
+  .mock .tag{
+    display:inline-block;margin-top:6px;font-size:.66rem;letter-spacing:.06em;
+    text-transform:uppercase;font-weight:600;padding:3px 8px;border-radius:999px;
+    border:1px solid rgba(196,243,5,.4);color:var(--amber)
+  }
+  .mock .tag.autonomia{border-color:rgba(87,32,254,.75);color:#b8a7ff}
+  .mock .tag.general{border-color:var(--line-strong);color:var(--muted)}
+
+  /* Visor de la pantalla ampliada */
+  .lightbox{
+    position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;
+    gap:14px;padding:20px;background:rgba(10,8,7,.92);backdrop-filter:blur(4px)
+  }
+  .lightbox.abierto{display:flex}
+  .lb-caja{display:flex;flex-direction:column;align-items:center;gap:12px;min-height:0}
+  .lightbox img{max-height:calc(100vh - 150px);max-width:min(430px,82vw);width:auto;border-radius:16px;border:1px solid var(--line-strong);box-shadow:0 30px 70px rgba(0,0,0,.6)}
+  .lb-cap{text-align:center;padding:0 10px;max-width:70ch}
+  .lb-cap b{display:block;font-family:var(--display);font-size:1rem;color:var(--ivory)}
+  .lb-cap span{display:block;font-size:.78rem;color:var(--muted);margin:2px auto 0}
+  .lb-btn{
+    background:rgba(24,20,19,.9);border:1px solid var(--line-strong);color:var(--ivory);
+    width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:1.3rem;line-height:1;
+    display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s
+  }
+  .lb-btn:hover{background:var(--obsidian);color:var(--amber);border-color:rgba(196,243,5,.5)}
+  .lb-cerrar{position:fixed;right:16px;top:16px}
+
+  @media (max-width:760px){
+    .mock-grid{
+      grid-auto-flow:column;grid-auto-columns:64%;grid-template-columns:none;
+      overflow-x:auto;scroll-snap-type:x mandatory;padding:0 0 10px;gap:12px;
+      scrollbar-width:thin
+    }
+    .mock{scroll-snap-align:center}
+    .lightbox{gap:6px;padding:12px}
+    .lb-btn{width:36px;height:36px;font-size:1.1rem}
+    .lightbox img{max-width:74vw;max-height:calc(100vh - 140px)}
+  }
   @media (prefers-reduced-motion:reduce){
     .fill{transition:none}
     html{scroll-behavior:auto}
@@ -352,9 +411,9 @@
     <h1>Plataforma GPS para movilidad segura <span class="hl">adaptada a la autonomía</span> de vehículos eléctricos</h1>
     <p class="lead">
       Tablero de resultados del proyecto. Concentra en un solo lugar el diagnóstico comunitario
-      aplicado en el corredor universitario del sur de Cali, las metas de logro declaradas por
-      objetivo y la metodología de trabajo en seis fases. Es la evidencia central de los
-      resultados cuantitativos, cualitativos y medibles de la postulación.
+      aplicado en el corredor universitario del sur de Cali, el sector de estudio, la metodología
+      de trabajo en seis fases y las pantallas de diseño de la aplicación. Es la evidencia central
+      de los resultados cuantitativos, cualitativos y medibles de la postulación.
     </p>
     <ul class="chips">
       <li class="tag">Marca del proyecto: Ruta CCV</li>
@@ -375,9 +434,8 @@
       <li><a href="#diagnostico">Diagnóstico comunitario</a></li>
       <li><a href="#hallazgos">Hallazgos cualitativos</a></li>
       <li><a href="#corredor">Sector de estudio</a></li>
-      <li><a href="#metas">Metas de logro</a></li>
       <li><a href="#metodologia">Metodología</a></li>
-      <li><a href="#trazabilidad">Trazabilidad</a></li>
+      <li><a href="#aplicacion">La aplicación</a></li>
     </ul>
   </div>
 </nav>
@@ -609,23 +667,10 @@
     </div>
   </section>
 
-  <!-- 4. METAS -->
-  <section id="metas">
-    <div class="wrap">
-      <div class="sec-head"><span class="sec-num">04</span><h2>Metas de logro por objetivo</h2></div>
-      <p class="sec-sub">
-        El avance del proyecto se mide contra los objetivos y no contra el volumen de código
-        escrito. Para esta primera versión cada objetivo declara su porcentaje de logro esperado y,
-        sobre todo, el producto verificable con el que se comprueba en la entrega.
-      </p>
-      <div class="grid g3" id="metas-grid"></div>
-    </div>
-  </section>
-
-  <!-- 5. METODOLOGÍA -->
+  <!-- 4. METODOLOGÍA -->
   <section id="metodologia">
     <div class="wrap">
-      <div class="sec-head"><span class="sec-num">05</span><h2>Metodología en seis fases</h2></div>
+      <div class="sec-head"><span class="sec-num">04</span><h2>Metodología en seis fases</h2></div>
       <p class="sec-sub">
         Trabajo por fases con un producto verificable en cada una. La metodología es iterativa: si
         la validación no se cumple, se reabre la fase anterior en lugar de avanzar.
@@ -635,33 +680,22 @@
     </div>
   </section>
 
-  <!-- 6. TRAZABILIDAD -->
-  <section id="trazabilidad">
+  <!-- 5. LA APLICACIÓN -->
+  <section id="aplicacion">
     <div class="wrap">
-      <div class="sec-head"><span class="sec-num">06</span><h2>Trazabilidad de los datos</h2></div>
+      <div class="sec-head"><span class="sec-num">05</span><h2>La aplicación: pantallas de diseño</h2></div>
       <p class="sec-sub">
-        Cada cifra y cada gráfico de este tablero proviene de un documento del proyecto. Esta tabla
-        permite al jurado verificar de dónde sale lo que aquí se afirma.
+        Así se ve <strong>Ruta CCV</strong> en el teléfono. Las nueve pantallas muestran el
+        recorrido completo de un viaje: se elige el vehículo, se ingresa la carga de la batería,
+        la app propone rutas que evitan las zonas de riesgo <strong>y</strong> que caben en la
+        autonomía disponible, y al final se ve el resumen. Todas están hechas con la identidad
+        visual del proyecto y son la base de las diapositivas y del video.
       </p>
-      <div class="tbl-scroll">
-        <table>
-          <thead>
-            <tr><th>Qué se muestra</th><th>De dónde sale</th></tr>
-          </thead>
-          <tbody>
-            <tr><td class="strong">Respuestas y frecuencias de la encuesta</td><td>Encuesta de movilidad aplicada en el corredor (14–18 de septiembre de 2026) y su libro de análisis con las tablas de frecuencia.</td></tr>
-            <tr><td class="strong">Los 21 registros, cifras y porcentajes</td><td>Resultados publicados en la sección de metodología de las propuestas de los dos módulos del trabajo de grado.</td></tr>
-            <tr><td class="strong">Metas de logro (45 %, 40 % y 30 %)</td><td>Sección «Resultados esperados» de las propuestas de los dos módulos.</td></tr>
-            <tr><td class="strong">Fases y productos verificables</td><td>Sección «Metodología» de las propuestas (fases 3, 4 y 5) y el esquema de la metodología.</td></tr>
-            <tr><td class="strong">Delimitación del sector de estudio</td><td>Mapa del corredor universitario del sur de Cali elaborado por el equipo.</td></tr>
-            <tr><td class="strong">Nombre y logo</td><td>Manual de marca del proyecto: «Ruta CCV».</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="mock-grid" id="mockups"></div>
       <p class="card-note">
-        El tablero lo construyó el equipo de trabajo con apoyo de herramientas de inteligencia
-        artificial. No publica datos personales: ni los encuestados ni sus sugerencias aparecen
-        identificados.
+        Son pantallas de diseño con datos de ejemplo —bicicleta eléctrica de 26 km de autonomía
+        con 68 % de carga—; todavía no son la aplicación funcionando. Toca una pantalla para
+        verla completa.
       </p>
     </div>
   </section>
@@ -699,6 +733,16 @@
     </p>
   </div>
 </footer>
+<!-- Visor de las pantallas de la aplicación -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Pantalla ampliada de la aplicación">
+  <button class="lb-btn lb-cerrar" type="button" id="lb-cerrar" aria-label="Cerrar">&#10005;</button>
+  <button class="lb-btn" type="button" id="lb-prev" aria-label="Pantalla anterior">&#8249;</button>
+  <div class="lb-caja">
+    <img id="lb-img" src="" alt="">
+    <div class="lb-cap"><b id="lb-tit"></b><span id="lb-txt"></span></div>
+  </div>
+  <button class="lb-btn" type="button" id="lb-next" aria-label="Pantalla siguiente">&#8250;</button>
+</div>
 
 <script>
 /* ==========================================================================
@@ -1212,16 +1256,6 @@ function render(){
   txt("txt-sug", DATA.sugerencias);
   txt("txt-sug-base", DATA.medio.base);
 
-  /* Metas de logro */
-  el("metas-grid").innerHTML = DATA.metas.map(m=>`<div class="goal">
-      <div class="gh">
-        <div><div class="gmeta">Logro esperado</div><div class="gt">${m.t}</div></div>
-        <div class="gp">${m.p} %</div>
-      </div>
-      <div class="track"><div class="fill" data-w="${m.p}"></div></div>
-      <div class="gprod"><b>Producto que lo mide:</b> ${m.producto}</div>
-    </div>`).join("");
-
   /* Fases de la metodología */
   el("fases").innerHTML = DATA.fases.map(f=>`<article class="phase">
       <div class="pn">${f.n}</div>
@@ -1301,7 +1335,102 @@ function cargarEnVivo(){
   setTimeout(function(){ terminar(marcarRespaldo); }, FUENTE.tiempoEspera);
 }
 
+/* -------------------------------------------------------------------------
+   PANTALLAS DE LA APLICACIÓN
+   Son los mockups de `Prototipo/` (pantallas de diseño en HTML+CSS con la marca
+   Ruta CCV), exportados a PNG y reducidos aquí a 620 px de ancho en WebP para
+   que el tablero cargue rápido. No son la app funcionando: son el diseño.
+   ------------------------------------------------------------------------- */
+const MOCKUPS = [
+  { f:"01-apertura",   n:"01", t:"Apertura", tag:"Marca",
+    d:"Entrada con el logotipo de Ruta CCV y las dos funciones del proyecto: bloqueo de zonas de riesgo y autonomía real." },
+  { f:"02-vehiculo",   n:"02", t:"Tipo de movilidad", tag:"Autonomía",
+    d:"Bicicleta eléctrica (26 km de autonomía base) o patineta eléctrica (18 km): de ahí parte el cálculo." },
+  { f:"03-autonomia",  n:"03", t:"Carga del vehículo", tag:"Autonomía",
+    d:"El usuario ingresa el porcentaje de batería y la app estima los kilómetros disponibles antes de salir." },
+  { f:"04-inicio",     n:"04", t:"Inicio", tag:"Seguridad",
+    d:"Mapa del corredor con las zonas bloqueadas activas y la autonomía siempre a la vista." },
+  { f:"05-rutas",      n:"05", t:"Rutas para tu autonomía", tag:"Seguridad y autonomía",
+    d:"Compara la ruta segura con la directa y muestra con cuánta batería se llega en cada una." },
+  { f:"06-navegacion", n:"06", t:"Navegación activa", tag:"Seguridad",
+    d:"Si el trayecto se acerca a una zona de riesgo, la app avisa y recalcula la ruta." },
+  { f:"07-reportar",   n:"07", t:"Reportar riesgo", tag:"Seguridad",
+    d:"Reporte comunitario con texto y ubicación automática, sin fotos ni videos, como define el alcance." },
+  { f:"08-perfil",     n:"08", t:"Perfil y vehículo", tag:"Autonomía",
+    d:"Datos del vehículo y del usuario con los que se estima la autonomía y se personalizan las rutas." },
+  { f:"09-resumen",    n:"09", t:"Cierre del viaje", tag:"General",
+    d:"Kilómetros, batería usada y, al llegar, zonas de riesgo evitadas y CO₂ evitado." }
+];
+
+let mockActual = 0;
+
+function pintaMockups(){
+  const c = el("mockups");
+  if (!c) return;
+  c.innerHTML = MOCKUPS.map(function(m, i){
+    const clase = m.tag === "Autonomía" ? " autonomia" : (m.tag === "General" ? " general" : "");
+    return `<figure class="mock" role="button" tabindex="0" data-i="${i}"
+              aria-label="Ampliar la pantalla ${m.n}: ${m.t}">
+        <span class="num">${m.n}</span>
+        <img src="assets/mockups/${m.f}.webp" width="620" height="1342" loading="lazy"
+             alt="Pantalla ${m.n} de la aplicación: ${m.t}. ${m.d}">
+        <figcaption>
+          <b>${m.t}</b>
+          <span>${m.d}</span>
+          <span class="tag${clase}">${m.tag}</span>
+        </figcaption>
+      </figure>`;
+  }).join("");
+
+  c.addEventListener("click", function(e){
+    const f = e.target.closest(".mock");
+    if (f) abrirMock(Number(f.dataset.i));
+  });
+  c.addEventListener("keydown", function(e){
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const f = e.target.closest(".mock");
+    if (!f) return;
+    e.preventDefault();
+    abrirMock(Number(f.dataset.i));
+  });
+
+  const lb = el("lightbox");
+  el("lb-cerrar").addEventListener("click", cerrarMock);
+  el("lb-prev").addEventListener("click", function(){ abrirMock(mockActual - 1); });
+  el("lb-next").addEventListener("click", function(){ abrirMock(mockActual + 1); });
+  lb.addEventListener("click", function(e){ if (e.target === lb) cerrarMock(); });
+  document.addEventListener("keydown", function(e){
+    if (!lb.classList.contains("abierto")) return;
+    if (e.key === "Escape") cerrarMock();
+    else if (e.key === "ArrowLeft") abrirMock(mockActual - 1);
+    else if (e.key === "ArrowRight") abrirMock(mockActual + 1);
+  });
+}
+
+function abrirMock(i){
+  const lb = el("lightbox");
+  if (!lb || !MOCKUPS.length) return;
+  mockActual = (i + MOCKUPS.length) % MOCKUPS.length;
+  const m = MOCKUPS[mockActual];
+  const img = el("lb-img");
+  img.src = "assets/mockups/" + m.f + ".webp";
+  img.alt = "Pantalla " + m.n + " de la aplicación: " + m.t;
+  el("lb-tit").textContent = m.n + " · " + m.t;
+  el("lb-txt").textContent = m.d;
+  lb.classList.add("abierto");
+  document.body.style.overflow = "hidden";
+  el("lb-cerrar").focus();
+}
+
+function cerrarMock(){
+  const lb = el("lightbox");
+  if (!lb) return;
+  lb.classList.remove("abierto");
+  document.body.style.overflow = "";
+}
+
 render();
+pintaMockups();
 cargarMapa();
 cargarEnVivo();
 </script>
