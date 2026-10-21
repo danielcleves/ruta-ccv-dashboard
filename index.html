@@ -245,10 +245,10 @@
   .map-hint{margin:0;font-size:.78rem;color:var(--muted)}
   .map-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
   /* Leaflet con la paleta de la marca */
-  .leaflet-container{background:#e9e7e2;font-family:var(--sans);outline:none}
-  /* Nota: no se le aplica filtro CSS a las teselas (saturación/tinte): en algunas
-     GPU y en capturas sin pantalla provoca artefactos de composición. El color
-     de marca lo ponen el área de estudio, los puntos y los rótulos. */
+  .leaflet-container{background:#f7f7f5;font-family:var(--sans);outline:none}
+  /* Nota: a las teselas no se les aplica filtro CSS (saturación/tinte): en
+     algunas GPU provoca artefactos de composición. La base ya es gris claro y
+     el color de marca lo ponen el área de estudio, los puntos y los rótulos. */
   .leaflet-control-zoom{border:none!important;box-shadow:0 6px 18px rgba(0,0,0,.4)!important}
   .leaflet-control-zoom a{
     background:rgba(24,20,19,.92)!important;color:var(--ivory)!important;
@@ -779,7 +779,7 @@ const DATA = {
 };
 
 /* -------------------------------------------------------------------------
-   MAPA INTERACTIVO (Leaflet + teselas de OpenStreetMap)
+   MAPA INTERACTIVO (Leaflet + teselas de Esri)
 
    La geometría se tomó del mapa de marca «Mapa de delimitacion - corredor sur
    de Cali - marca Ruta CCV.svg» (generado por
@@ -787,11 +787,32 @@ const DATA = {
    georreferencia del mapa publicado): mismo encuadre, misma área de estudio y
    los mismos cinco puntos de interés. Si Leaflet o las teselas no cargan, se
    queda visible el mapa estático de respaldo (assets/mapa_corredor.jpg).
+
+   OJO con el proveedor de teselas: las teselas públicas de OpenStreetMap
+   (tile.openstreetmap.org) devuelven 403 a este tablero —«App is not following
+   the tile usage policy»— porque su política no permite el uso desde
+   aplicaciones servidas así. Por eso se usan las teselas de Esri (gris claro
+   para la base, muy cerca del Ivory Haze de la marca), con un segundo proveedor
+   de respaldo y, si ninguno responde, la imagen estática.
    ------------------------------------------------------------------------- */
 const MAPA = {
   libreria: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
-  teselas: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-  atribucion: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
+  proveedores: [
+    {
+      n: "Esri · Light Gray Canvas",
+      url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+      maxNativeZoom: 16,
+      atribucion: 'Teselas &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>'
+                + ' — Esri, HERE, Garmin, &copy; OpenStreetMap contributors'
+    },
+    {
+      n: "Esri · World Street Map",
+      url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+      maxNativeZoom: 18,
+      atribucion: 'Teselas &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>'
+                + ' — Esri, HERE, Garmin, USGS, &copy; OpenStreetMap contributors'
+    }
+  ],
   // Esquinas del área de estudio (N-O, N-E, S-E, S-O) tal como quedan en la figura
   area: [ [3.381995,-76.550037], [3.381995,-76.514225], [3.334127,-76.514225], [3.334127,-76.550037] ],
   centro: [3.358061, -76.532131],
@@ -848,7 +869,7 @@ function initMapa(){
     center: MAPA.centro,
     zoom: 15,
     minZoom: 13,
-    maxZoom: 18,
+    maxZoom: 17,
     zoomControl: true,
     scrollWheelZoom: false,          // se activa al hacer clic, para no secuestrar el scroll
     attributionControl: true,
@@ -856,41 +877,61 @@ function initMapa(){
   });
   MAPA_ESTADO.mapa = mapa;
 
-  /* Velo de marca sobre las teselas: las acerca al Ivory Haze de la paleta.
-     Se hace con una capa translúcida (no con un filtro CSS, que en algunas GPU
-     da problemas de composición). Queda por debajo del área y de los puntos. */
-  mapa.createPane("velo");
-  const velo = mapa.getPane("velo");
-  velo.style.zIndex = 350;
-  velo.style.pointerEvents = "none";
-  velo.style.background = "rgba(243,243,243,.34)";
+  /* Capa base: cadena de proveedores. Se queda el primero que responda; si
+     ninguno responde, se muestra el mapa estático de respaldo. */
+  let capa = null, temporizador = null;
 
-  /* Teselas de OpenStreetMap (se atenúan con CSS para acercarlas a la paleta) */
-  const capa = L.tileLayer(MAPA.teselas, {
-    maxZoom: 19,
-    attribution: MAPA.atribucion,
-    crossOrigin: true
-  }).addTo(mapa);
-  capa.on("tileload", function(){
-    MAPA_ESTADO.teselas++;
+  function proveedorListo(){
     if (!wrap.classList.contains("listo")){
       wrap.classList.remove("respaldo");
       wrap.classList.add("listo");
-      ["mapa-reset","mapa-fs"].forEach(function(id){
-        const b = el(id); if (b) b.style.display = "";
-      });
     }
-  });
+    ["mapa-reset","mapa-fs"].forEach(function(id){
+      const b = el(id); if (b) b.style.display = "";
+    });
+  }
 
-  /* Área de estudio: rectángulo violeta de la figura (con halo claro para que
-     se lea sobre las teselas) */
-  L.polygon(MAPA.area, {
-    color:"rgba(243,243,243,.8)", weight:5.5, opacity:.85, fill:false, interactive:false
-  }).addTo(mapa);
+  function cargarProveedor(i){
+    if (i >= MAPA.proveedores.length){ mapaRespaldo(); return; }
+    const p = MAPA.proveedores[i];
+    let cargadas = 0, errores = 0;
 
+    if (capa){ mapa.removeLayer(capa); capa = null; }
+    capa = L.tileLayer(p.url, {
+      maxNativeZoom: p.maxNativeZoom,
+      maxZoom: 17,
+      attribution: p.atribucion,
+      crossOrigin: true
+    });
+    capa.on("tileload", function(){
+      cargadas++;
+      MAPA_ESTADO.teselas++;
+      clearTimeout(temporizador);
+      proveedorListo();
+    });
+    capa.on("tileerror", function(){
+      errores++;
+      if (cargadas === 0 && errores >= 3){
+        clearTimeout(temporizador);
+        cargarProveedor(i + 1);
+      }
+    });
+    capa.addTo(mapa);
+
+    /* Si en 9 s no llegó ninguna tesela, se pasa al siguiente proveedor */
+    clearTimeout(temporizador);
+    temporizador = setTimeout(function(){
+      if (cargadas === 0) cargarProveedor(i + 1);
+    }, 9000);
+  }
+  cargarProveedor(0);
+
+  /* Área de estudio: rectángulo violeta de la figura. La base de Esri es muy
+     clara, así que el relleno va suave y el borde grueso: el área se lee sin
+     tapar las calles. */
   const zona = L.polygon(MAPA.area, {
-    color:"#5720FE", weight:2.5, opacity:.95,
-    fillColor:"#5720FE", fillOpacity:.10,
+    color:"#5720FE", weight:3, opacity:.95,
+    fillColor:"#5720FE", fillOpacity:.06,
     bubblingMouseEvents:false
   }).addTo(mapa);
   MAPA_ESTADO.zona = zona;
@@ -942,9 +983,6 @@ function initMapa(){
 
   /* Rueda del ratón solo después de interactuar con el mapa */
   mapa.on("click", function(){ mapa.scrollWheelZoom.enable(); });
-
-  /* Si en 10 s no llegó ninguna tesela, se muestra la versión estática */
-  setTimeout(function(){ if (MAPA_ESTADO.teselas === 0) mapaRespaldo(); }, 10000);
 
   /* Repintar al cambiar el tamaño de la ventana */
   let t = null;
