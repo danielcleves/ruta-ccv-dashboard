@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
   :root{
     --obsidian:#181413;
@@ -209,10 +210,106 @@
   .goal .track .fill{background:linear-gradient(90deg,var(--amber),#a6d100)}
 
   /* ---------- Map ---------- */
-  .map-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:20px;grid-template-columns:minmax(0,1.25fr) minmax(240px,.75fr);align-items:start}
-  .map-card img{border-radius:10px;border:1px solid var(--line-strong);max-height:640px;max-width:100%;width:auto;height:auto;margin:0 auto}
-  .map-side{display:grid;gap:14px}
+  .map-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:16px}
+  .map-wrap{position:relative;height:clamp(420px,58vh,600px);border-radius:12px;overflow:hidden;border:1px solid var(--line-strong);background:var(--obsidian-deep)}
+  #mapa{position:absolute;inset:0;z-index:1;opacity:0;transition:opacity .4s ease}
+  .map-wrap.listo #mapa{opacity:1}
+  .map-fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--obsidian);transition:opacity .4s ease}
+  .map-wrap.listo .map-fallback{opacity:0;pointer-events:none}
+  .map-wrap.respaldo{height:auto}
+  .map-wrap.respaldo .map-fallback{
+    position:static;display:block;width:auto;max-width:100%;max-height:620px;height:auto;
+    margin:0 auto;background:var(--obsidian);opacity:1;pointer-events:auto
+  }
+  .map-wrap.respaldo .map-north,.map-wrap.respaldo .map-tools,.map-wrap.respaldo .map-legend{display:none}
+  .map-legend{
+    position:absolute;left:12px;top:12px;z-index:600;pointer-events:none;
+    background:rgba(24,20,19,.9);border:1px solid var(--line-strong);border-radius:10px;
+    padding:10px 12px;display:grid;gap:7px;font-size:.73rem;color:var(--ivory);
+    letter-spacing:.01em;box-shadow:0 10px 26px rgba(0,0,0,.4)
+  }
+  .map-legend .it{display:flex;align-items:center;gap:8px}
+  .map-legend .lg-short{display:none}
+  .map-legend .zona{width:20px;height:11px;border-radius:2px;background:rgba(87,32,254,.3);border:1.5px solid var(--dusk);flex:none}
+  .map-legend .punto{width:10px;height:10px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 2px var(--obsidian);flex:none}
+  .map-tools{position:absolute;right:12px;top:12px;z-index:600;display:flex;gap:8px}
+  .map-btn{
+    background:rgba(24,20,19,.92);border:1px solid rgba(196,243,5,.45);color:var(--amber);
+    font-family:var(--sans);font-weight:600;font-size:.73rem;letter-spacing:.02em;
+    padding:7px 11px;border-radius:8px;cursor:pointer;transition:background .2s ease,color .2s ease
+  }
+  .map-btn:hover{background:rgba(196,243,5,.16)}
+  .map-wrap:fullscreen{border-radius:0;border:none;height:100vh;width:100vw;background:var(--obsidian)}
+  .map-wrap:-webkit-full-screen{border-radius:0;border:none;height:100vh;width:100vw}
+  .map-wrap:fullscreen .map-hint{display:none}
+  .map-hint{margin:0;font-size:.78rem;color:var(--muted)}
   .map-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+  /* Leaflet con la paleta de la marca */
+  .leaflet-container{background:#e9e7e2;font-family:var(--sans);outline:none}
+  /* Nota: no se le aplica filtro CSS a las teselas (saturación/tinte): en algunas
+     GPU y en capturas sin pantalla provoca artefactos de composición. El color
+     de marca lo ponen el área de estudio, los puntos y los rótulos. */
+  .leaflet-control-zoom{border:none!important;box-shadow:0 6px 18px rgba(0,0,0,.4)!important}
+  .leaflet-control-zoom a{
+    background:rgba(24,20,19,.92)!important;color:var(--ivory)!important;
+    border:1px solid rgba(243,243,243,.18)!important;width:30px!important;height:30px!important;
+    line-height:28px!important;font-size:1rem!important
+  }
+  .leaflet-control-zoom a:hover{background:var(--obsidian)!important;color:var(--amber)!important}
+  .leaflet-control-attribution{
+    background:rgba(24,20,19,.85)!important;color:rgba(243,243,243,.72)!important;
+    font-size:.65rem!important;padding:2px 7px!important;border-radius:6px 0 0 0
+  }
+  .leaflet-control-attribution a{color:var(--amber)!important}
+  .leaflet-control-scale-line{
+    background:rgba(24,20,19,.85)!important;color:var(--ivory)!important;
+    border-color:rgba(243,243,243,.4)!important;font-size:.66rem!important
+  }
+  .leaflet-tooltip.poi-label{
+    background:rgba(24,20,19,.93);border:1px solid rgba(196,243,5,.5);color:var(--ivory);
+    font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.01em;
+    padding:4px 9px;border-radius:6px;box-shadow:0 8px 20px rgba(0,0,0,.45);white-space:nowrap
+  }
+  .leaflet-tooltip.poi-label:before{display:none}
+  .leaflet-popup-content-wrapper{
+    background:var(--obsidian);color:var(--ivory);border:1px solid rgba(196,243,5,.35);
+    border-radius:10px;box-shadow:0 18px 40px rgba(0,0,0,.55)
+  }
+  .leaflet-popup-content{margin:12px 14px;font-family:var(--sans);font-size:.84rem;line-height:1.45}
+  .leaflet-popup-content b{
+    display:block;margin-bottom:3px;font-family:var(--display);font-size:.98rem;
+    letter-spacing:.02em;color:var(--amber)
+  }
+  .leaflet-popup-content span{display:block;color:rgba(243,243,243,.8)}
+  .leaflet-popup-tip{background:var(--obsidian);border:1px solid rgba(196,243,5,.35)}
+  .leaflet-container a.leaflet-popup-close-button{color:rgba(243,243,243,.6)}
+  .leaflet-container a.leaflet-popup-close-button:hover{color:var(--amber)}
+  .poi-icono{background:none;border:none}
+  .poi-dot{
+    display:block;width:16px;height:16px;border-radius:50%;box-sizing:border-box;
+    background:var(--amber);border:3px solid var(--obsidian);
+    box-shadow:0 0 0 2px rgba(196,243,5,.35), 0 2px 8px rgba(0,0,0,.45);
+    transition:transform .15s ease
+  }
+  .leaflet-marker-icon:hover .poi-dot,.leaflet-marker-icon:focus .poi-dot{transform:scale(1.18)}
+  .map-north{
+    position:absolute;right:14px;bottom:44px;z-index:600;pointer-events:none;
+    background:rgba(24,20,19,.9);border:1px solid var(--line-strong);border-radius:8px;
+    padding:6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;
+    font-family:var(--display);font-weight:700;font-size:.68rem;letter-spacing:.08em;color:var(--ivory)
+  }
+  @media (max-width:700px){
+    .map-wrap{height:clamp(380px,54vh,470px)}
+    .map-wrap.respaldo{height:auto}
+    .map-tools{right:10px;top:10px;flex-direction:column;align-items:stretch}
+    .map-btn{font-size:.69rem;padding:6px 9px;text-align:center}
+    .map-legend{left:10px;top:10px;font-size:.66rem;padding:7px 9px;max-width:160px;gap:6px}
+    .map-legend .lg-long{display:none}
+    .map-legend .lg-short{display:inline}
+    .map-legend .it{align-items:center}
+    .map-north{right:10px;bottom:38px;padding:5px 6px}
+    .poi-label{font-size:.66rem;padding:3px 7px}
+  }
   .fact{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
   .fact .fl{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
   .fact .fv{font-family:var(--display);font-weight:600;font-size:1rem;margin-top:5px}
@@ -472,23 +569,41 @@
         catálogo de condiciones de la vía y se prueban las rutas.
       </p>
       <div class="map-card">
-        <img src="assets/mapa_corredor.jpg" alt="Mapa del corredor universitario del sur de Cali con los puntos de interés del sector de estudio" loading="lazy">
-        <div class="map-side">
-          <div class="map-facts">
-            <div class="fact"><div class="fl">Ciudad de las pruebas</div><div class="fv">Cali, Valle del Cauca</div></div>
-            <div class="fact"><div class="fl">Corredor</div><div class="fv">Sur de la ciudad (corredor universitario)</div></div>
-            <div class="fact"><div class="fl">Vehículos</div><div class="fv">Bicicletas y patinetas eléctricas</div></div>
-            <div class="fact"><div class="fl">Trayectos típicos</div><div class="fv">1 a 5 km · menos de 30 minutos</div></div>
+        <div class="map-wrap" id="mapa-wrap">
+          <img class="map-fallback" id="mapa-fallback" src="assets/mapa_corredor.jpg"
+               alt="Mapa del corredor universitario del sur de Cali con el área de estudio delimitada y los puntos de interés">
+          <div id="mapa" role="application" aria-label="Mapa interactivo del corredor universitario del sur de Cali"></div>
+          <div class="map-legend">
+            <div class="it"><i class="zona"></i><span><span class="lg-long">Zona delimitada (área de estudio)</span><span class="lg-short">Área de estudio</span></span></div>
+            <div class="it"><i class="punto"></i><span>Puntos de interés</span></div>
           </div>
-          <div class="card" style="background:var(--panel-2)">
-            <h3>Qué delimita el mapa</h3>
-            <p style="margin:0;font-size:.9rem;color:rgba(243,243,243,.84)">
-              La zona azul es el área de estudio sobre la que se construye el catálogo
-              georreferenciado de condiciones de la vía. Los puntos marcan los nodos de interés
-              del corredor: las universidades del sector y los puntos de referencia que se usan
-              para ubicar el levantamiento.
-            </p>
+          <div class="map-tools">
+            <button class="map-btn" type="button" id="mapa-reset">Ver todo el corredor</button>
+            <button class="map-btn" type="button" id="mapa-fs">Pantalla completa</button>
           </div>
+          <div class="map-north" aria-hidden="true">
+            <svg viewBox="0 0 12 18" width="11" height="17"><path d="M6 1 11 13 6 10.4 1 13Z" fill="#C4F305"/></svg>
+            <span>N</span>
+          </div>
+        </div>
+        <p class="map-hint" id="mapa-hint">
+          Arrastra para recorrer el sector, usa <strong>+</strong> / <strong>−</strong> para acercar
+          y toca un punto para ver su ficha. El recuadro violeta es el área de estudio:
+          ≈ 4,0 × 5,3 km del corredor universitario del sur de Cali.
+        </p>        <div class="map-facts">
+          <div class="fact"><div class="fl">Ciudad de las pruebas</div><div class="fv">Cali, Valle del Cauca</div></div>
+          <div class="fact"><div class="fl">Corredor</div><div class="fv">Sur de la ciudad (corredor universitario)</div></div>
+          <div class="fact"><div class="fl">Vehículos</div><div class="fv">Bicicletas y patinetas eléctricas</div></div>
+          <div class="fact"><div class="fl">Trayectos típicos</div><div class="fv">1 a 5 km · menos de 30 minutos</div></div>
+        </div>
+        <div class="card" style="background:var(--panel-2)">
+          <h3>Qué delimita el mapa</h3>
+          <p style="margin:0;font-size:.9rem;color:rgba(243,243,243,.84)">
+            La zona violeta es el área de estudio sobre la que se construye el catálogo
+            georreferenciado de condiciones de la vía. Los puntos marcan los nodos de interés
+            del corredor: las universidades del sector y los puntos de referencia que se usan
+            para ubicar el levantamiento.
+          </p>
         </div>
       </div>
     </div>
@@ -662,6 +777,197 @@ const DATA = {
       h:"Documento de trabajo consolidado, con coherencia entre objetivos, implementación y resultados, listo para la entrega." }
   ]
 };
+
+/* -------------------------------------------------------------------------
+   MAPA INTERACTIVO (Leaflet + teselas de OpenStreetMap)
+
+   La geometría se tomó del mapa de marca «Mapa de delimitacion - corredor sur
+   de Cali - marca Ruta CCV.svg» (generado por
+   .opencode/skills/formato-propuesta-docx/scripts/generar_mapa_marca.py con la
+   georreferencia del mapa publicado): mismo encuadre, misma área de estudio y
+   los mismos cinco puntos de interés. Si Leaflet o las teselas no cargan, se
+   queda visible el mapa estático de respaldo (assets/mapa_corredor.jpg).
+   ------------------------------------------------------------------------- */
+const MAPA = {
+  libreria: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+  teselas: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  atribucion: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
+  // Esquinas del área de estudio (N-O, N-E, S-E, S-O) tal como quedan en la figura
+  area: [ [3.381995,-76.550037], [3.381995,-76.514225], [3.334127,-76.514225], [3.334127,-76.550037] ],
+  centro: [3.358061, -76.532131],
+  pois: [
+    { n:"Estación Meléndez", lat:3.377537, lon:-76.542710, lado:"right",
+      tipo:"Estación de transporte masivo",
+      txt:"Punto de referencia del corredor y estación del sistema de transporte masivo de Cali." },
+    { n:"U. Autónoma de Occidente", lat:3.353690, lon:-76.521336, lado:"left",
+      tipo:"Universidad", encuesta:1,
+      txt:"Universidad del corredor universitario del sur de Cali." },
+    { n:"Universidad Javeriana", lat:3.347025, lon:-76.532738, lado:"right",
+      tipo:"Universidad",
+      txt:"Universidad del corredor universitario del sur de Cali." },
+    { n:"La Unicatólica", lat:3.345726, lon:-76.540238, lado:"left",
+      tipo:"Universidad",
+      txt:"Universidad del corredor universitario del sur de Cali." },
+    { n:"Universidad Icesi", lat:3.340619, lon:-76.528793, lado:"right",
+      tipo:"Universidad", encuesta:0,
+      txt:"Universidad del corredor universitario del sur de Cali." }
+  ]
+};
+
+/* Ficha que abre cada punto. Si la encuesta está conectada en vivo, el conteo
+   de respuestas por universidad se lee de DATA. */
+function fichaPOI(p, i){
+  let extra = "";
+  if (p.encuesta !== undefined){
+    const u = DATA.universidades[p.encuesta] || { l:p.n, n:0 };
+    extra = `<span>En su comunidad se aplicó la encuesta de movilidad: `
+          + `${u.n} de las ${DATA.encuesta.respuestas} respuestas.</span>`;
+  }
+  return `<b>${p.n}</b><span>${p.tipo}</span><span>${p.txt}</span>${extra}`;
+}
+
+const MAPA_ESTADO = { mapa:null, marcadores:[], zona:null, teselas:0 };
+
+function mapaRespaldo(){
+  const wrap = el("mapa-wrap");
+  if (wrap){ wrap.classList.remove("listo"); wrap.classList.add("respaldo"); }
+  const btn = el("mapa-reset");
+  if (btn) btn.style.display = "none";
+  const btnFs = el("mapa-fs");
+  if (btnFs) btnFs.style.display = "none";
+  const h = el("mapa-hint");
+  if (h) h.innerHTML = "Se muestra la <strong>versión estática</strong> del mapa: el mapa interactivo "
+                     + "no pudo cargar (por ejemplo, sin conexión). La delimitación y los puntos son los mismos.";
+}
+
+function initMapa(){
+  const cont = el("mapa"), wrap = el("mapa-wrap");
+  if (!cont || !wrap || !window.L) return false;
+
+  const mapa = L.map(cont, {
+    center: MAPA.centro,
+    zoom: 15,
+    minZoom: 13,
+    maxZoom: 18,
+    zoomControl: true,
+    scrollWheelZoom: false,          // se activa al hacer clic, para no secuestrar el scroll
+    attributionControl: true,
+    zoomSnap: .5
+  });
+  MAPA_ESTADO.mapa = mapa;
+
+  /* Velo de marca sobre las teselas: las acerca al Ivory Haze de la paleta.
+     Se hace con una capa translúcida (no con un filtro CSS, que en algunas GPU
+     da problemas de composición). Queda por debajo del área y de los puntos. */
+  mapa.createPane("velo");
+  const velo = mapa.getPane("velo");
+  velo.style.zIndex = 350;
+  velo.style.pointerEvents = "none";
+  velo.style.background = "rgba(243,243,243,.34)";
+
+  /* Teselas de OpenStreetMap (se atenúan con CSS para acercarlas a la paleta) */
+  const capa = L.tileLayer(MAPA.teselas, {
+    maxZoom: 19,
+    attribution: MAPA.atribucion,
+    crossOrigin: true
+  }).addTo(mapa);
+  capa.on("tileload", function(){
+    MAPA_ESTADO.teselas++;
+    if (!wrap.classList.contains("listo")){
+      wrap.classList.remove("respaldo");
+      wrap.classList.add("listo");
+      ["mapa-reset","mapa-fs"].forEach(function(id){
+        const b = el(id); if (b) b.style.display = "";
+      });
+    }
+  });
+
+  /* Área de estudio: rectángulo violeta de la figura (con halo claro para que
+     se lea sobre las teselas) */
+  L.polygon(MAPA.area, {
+    color:"rgba(243,243,243,.8)", weight:5.5, opacity:.85, fill:false, interactive:false
+  }).addTo(mapa);
+
+  const zona = L.polygon(MAPA.area, {
+    color:"#5720FE", weight:2.5, opacity:.95,
+    fillColor:"#5720FE", fillOpacity:.10,
+    bubblingMouseEvents:false
+  }).addTo(mapa);
+  MAPA_ESTADO.zona = zona;
+  zona.bindPopup(
+    `<b>Área de estudio</b><span>≈ 4,0 × 5,3 km del corredor universitario del sur de Cali.</span>`
+    + `<span>Aquí se levanta el catálogo georreferenciado de condiciones de la vía y se prueban las rutas.</span>`,
+    { maxWidth:250 }
+  );
+
+  /* Puntos de interés */
+  const icono = L.divIcon({ className:"poi-icono", html:'<span class="poi-dot"></span>', iconSize:[16,16], iconAnchor:[8,8] });
+  const etiquetas = window.innerWidth >= 700;   // en móvil, los nombres salen al tocar
+  MAPA.pois.forEach(function(p, i){
+    const m = L.marker([p.lat, p.lon], { icon:icono, title:p.n, riseOnHover:true }).addTo(mapa);
+    m.bindPopup(fichaPOI(p, i), { maxWidth:280 });
+    if (etiquetas){
+      m.bindTooltip(p.n, {
+        permanent:true, direction:p.lado, className:"poi-label", opacity:1,
+        offset: p.lado === "right" ? [12,0] : [-12,0]
+      });
+    }
+    MAPA_ESTADO.marcadores.push({ marcador:m, poi:p });
+  });
+
+  /* Controles y encuadre igual al de la figura */
+  L.control.scale({ position:"bottomleft", imperial:false, maxWidth:120 }).addTo(mapa);
+  const encuadrar = function(){ mapa.fitBounds(zona.getBounds(), { padding:[18,18] }); };
+  encuadrar();
+  const btn = el("mapa-reset");
+  if (btn) btn.addEventListener("click", encuadrar);
+
+  /* Pantalla completa (útil para ver el detalle en la sustentación) */
+  const btnFs = el("mapa-fs");
+  if (btnFs && (wrap.requestFullscreen || wrap.webkitRequestFullscreen)){
+    btnFs.addEventListener("click", function(){
+      try{
+        if (document.fullscreenElement || document.webkitFullscreenElement){
+          (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        } else {
+          (wrap.requestFullscreen || wrap.webkitRequestFullscreen).call(wrap);
+        }
+      }catch(e){ btnFs.style.display = "none"; }
+    });
+    document.addEventListener("fullscreenchange", function(){
+      btnFs.textContent = document.fullscreenElement ? "Salir" : "Pantalla completa";
+      setTimeout(function(){ mapa.invalidateSize(); }, 160);
+    });
+  } else if (btnFs){ btnFs.style.display = "none"; }
+
+  /* Rueda del ratón solo después de interactuar con el mapa */
+  mapa.on("click", function(){ mapa.scrollWheelZoom.enable(); });
+
+  /* Si en 10 s no llegó ninguna tesela, se muestra la versión estática */
+  setTimeout(function(){ if (MAPA_ESTADO.teselas === 0) mapaRespaldo(); }, 10000);
+
+  /* Repintar al cambiar el tamaño de la ventana */
+  let t = null;
+  window.addEventListener("resize", function(){
+    clearTimeout(t);
+    t = setTimeout(function(){ mapa.invalidateSize(); }, 220);
+  });
+
+  return true;
+}
+
+function cargarMapa(){
+  if (!el("mapa")) return;
+  if (window.L) { try { if (!initMapa()) mapaRespaldo(); } catch(e){ mapaRespaldo(); } return; }
+  const s = document.createElement("script");
+  s.src = MAPA.libreria;
+  s.crossOrigin = "";
+  s.onload = function(){
+    try { if (!initMapa()) mapaRespaldo(); } catch(e){ mapaRespaldo(); }
+  };
+  s.onerror = mapaRespaldo;
+  document.head.appendChild(s);
+}
 
 /* -------------------------------------------------------------------------
    Los valores que llegan de la hoja pública se vuelcan sobre DATA.
@@ -899,6 +1205,11 @@ function render(){
   requestAnimationFrame(()=>{
     document.querySelectorAll(".fill").forEach(f=>{ f.style.width = (f.dataset.w||0)+"%"; });
   });
+
+  /* Si el mapa ya está montado, refrescar los conteos de las fichas */
+  if (MAPA_ESTADO.marcadores.length){
+    MAPA_ESTADO.marcadores.forEach(function(o){ o.marcador.setPopupContent(fichaPOI(o.poi)); });
+  }
 }
 
 /* -------------------------------------------------------------------------
@@ -953,6 +1264,7 @@ function cargarEnVivo(){
 }
 
 render();
+cargarMapa();
 cargarEnVivo();
 </script>
 </body>
